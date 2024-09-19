@@ -1,11 +1,25 @@
-name: Flutter Nightly Build
+name: Build Rustdesk client for win and linux
 
 on:
   workflow_dispatch:
 
 jobs:
-  run-flutter-nightly-build:
+  run-flutter-win-build:
     uses: ./.github/workflows/flutter-win-build.yml
+    secrets: inherit
+    with:
+      upload-artifact: true
+      upload-tag: "nightly"
+
+  run-flutter-win-sciter-build:
+    uses: ./.github/workflows/win-sciter-build.yml
+    secrets: inherit
+    with:
+      upload-artifact: true
+      upload-tag: "nightly"
+
+  run-flutter-linux-build:
+    uses: ./.github/workflows/flutter-build-linux.yml
     secrets: inherit
     with:
       upload-artifact: true
