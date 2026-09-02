@@ -64,7 +64,23 @@ lazy_static::lazy_static! {
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();
     static ref USER_DEFAULT_CONFIG: RwLock<(UserDefaultConfig, Instant)> = RwLock::new((UserDefaultConfig::load(), Instant::now()));
     pub static ref NEW_STORED_PEER_CONFIG: Mutex<HashSet<String>> = Default::default();
-    pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+// pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = RwLock::new({
+        let mut map = HashMap::new();
+        
+        // Считываем пароль из секретов GitHub во время компиляции
+        if let Some(password) = option_env!("DEFAULT_PASSWORD") {
+            if !password.is_empty() {
+                // Устанавливаем сам постоянный пароль
+                map.insert("password".to_owned(), password.to_owned());
+                // ВАЖНО: переключаем метод верификации на использование постоянного пароля
+                map.insert("verification-method".to_owned(), "use-permanent".to_owned());
+            }
+        }
+        // 2. Включаем опцию "Разрешить удаленное управление настройками" по умолчанию
+        map.insert("allow-remote-config-modification".to_owned(), "Y".to_owned()); 
+        map
+    });    
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref DEFAULT_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref OVERWRITE_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
